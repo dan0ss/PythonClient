@@ -11,6 +11,7 @@ REQUIRES = [
     "python-dateutil",
     "pydantic >= 2",
     "typing-extensions >= 4.7.1",
+    "aiohttp >= 3.8.0",  # For high-performance async HTTP requests
 ]
 
 setup(
@@ -18,7 +19,7 @@ setup(
     version=VERSION,
     description="DataForSEO API documentation",
     author="DataForSeo",
-    author_email="info@dataforseo.com",
+    author_email="dan@perth-seo-agency.com.au",
     url="https://github.com/dataforseo/PythonClient",
     keywords=["OpenAPI", "DataForSEO", "DataForSEO API documentation"],
     install_requires=REQUIRES,

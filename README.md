@@ -10,18 +10,14 @@ DataForSEO API uses REST technology for interchanging data between your applicat
 Client contains 13 sections (aka APIs):
 
 - AI Optimization API (source docs | api docs)
-- SERP ([source docs](https://github.com/dataforseo/PythonClient/blob/master/docs/SerpApi.md) | [api docs](https://docs.dataforseo.com/v3/serp/overview/?bash))
-- Keywords Data ([source docs](https://github.com/dataforseo/PythonClient/blob/master/docs/KeywordsDataApi.md) | [api docs](https://docs.dataforseo.com/v3/keywords_data/overview/?bash))
-- Domain Analytics ([source docs](https://github.com/dataforseo/PythonClient/blob/master/docs/DomainAnalyticsApi.md) | [api docs](https://docs.dataforseo.com/v3/domain_analytics/overview/?bash))
-- DataForSEO Labs ([source docs](https://github.com/dataforseo/PythonClient/blob/master/docs/DataforseoLabsApi.md) | [api docs](https://docs.dataforseo.com/v3/dataforseo_labs/overview/?bash))
-- Backlinks ([source docs](https://github.com/dataforseo/PythonClient/blob/master/docs/BacklinksApi.md) | [api docs](https://docs.dataforseo.com/v3/backlinks/overview/?bash))
-- OnPage ([source docs](https://github.com/dataforseo/PythonClient/blob/master/docs/OnPageApi.md) | [api docs](https://docs.dataforseo.com/v3/on_page/overview/?bash))
-- Content Analysis ([source docs](https://github.com/dataforseo/PythonClient/blob/master/docs/ContentAnalysisApi.md) | [api docs](https://docs.dataforseo.com/v3/content_analysis/overview/?bash))
-- Content Generation ([source docs](https://github.com/dataforseo/PythonClient/blob/master/docs/ContentGenerationApi.md) | [api docs](https://docs.dataforseo.com/v3/content_generation/overview/?bash))
-- Merchant ([source docs](https://github.com/dataforseo/PythonClient/blob/master/docs/MerchantApi.md) | [api docs](https://docs.dataforseo.com/v3/merchant/overview/?bash))
-- AppData ([source docs](https://github.com/dataforseo/PythonClient/blob/master/docs/AppDataApi.md) | [api docs](https://docs.dataforseo.com/v3/app_data/overview/?bash))
-- Business Data ([source docs](https://github.com/dataforseo/PythonClient/blob/master/docs/BusinessDataApi.md) | [api docs](https://docs.dataforseo.com/v3/business_data/overview/?bash))
-- Appendix ([source docs](https://github.com/dataforseo/PythonClient/blob/master/docs/AppendixApi.md) | [api docs](https://docs.dataforseo.com/v3/appendix/user_data/?bash))
+- SERP ([source docs](/docs/SerpApi.md) | [api docs](https://docs.dataforseo.com/v3/serp/overview/?bash))
+- Keywords Data ([source docs](/docs/KeywordsDataApi.md) | [api docs](https://docs.dataforseo.com/v3/keywords_data/overview/?bash))
+- Domain Analytics ([source docs](/docs/DomainAnalyticsApi.md) | [api docs](https://docs.dataforseo.com/v3/domain_analytics/overview/?bash))
+- DataForSEO Labs ([source docs](/docs/DataforseoLabsApi.md) | [api docs](https://docs.dataforseo.com/v3/dataforseo_labs/overview/?bash))
+- OnPage ([source docs](/docs/OnPageApi.md) | [api docs](https://docs.dataforseo.com/v3/on_page/overview/?bash))
+- Content Analysis ([source docs](/docs/ContentAnalysisApi.md) | [api docs](https://docs.dataforseo.com/v3/content_analysis/overview/?bash))
+- Content Generation ([source docs](/docs/ContentGenerationApi.md) | [api docs](https://docs.dataforseo.com/v3/content_generation/overview/?bash))
+
 
 API Contains 2 types of requests:
 
@@ -34,7 +30,7 @@ API Contains 2 types of requests:
 Our API description is based on the OpenAPI [syntax](https://spec.openapis.org/oas/v3.1.0) in YAML format. The YAML file attached to the project [here](https://github.com/dataforseo/OpenApiDocumentation)
 
 ## Documentation
-The documentation for code objects, formatted in Markdown (.md) is available [here](https://github.com/dataforseo/PythonClient/blob/master/docs/). Official documentation for DataForSEO API is available [here](https://docs.dataforseo.com/v3/?bash).
+The documentation for code objects, formatted in Markdown (.md) is available [here](/docs/). Official documentation for DataForSEO API is available [here](https://docs.dataforseo.com/v3/?bash).
 
 ## Code generation
 
@@ -75,6 +71,87 @@ with dfs_api_provider.ApiClient(configuration) as api_client:
     except ApiException as e:
         print("Exception: %s\n" % e)
 ```
+
+### Google Organic Live Advanced → CSV exporter
+
+This repository also includes a helper script for exporting Google Organic Live Advanced SERP data (including AI Overview) to CSV files.
+
+#### Configuration
+
+- **Install dependencies** (from the repo root):
+
+```bash
+pip install -e .
+```
+
+- **Set DataForSEO credentials** via environment variables:
+
+```bash
+export DATAFORSEO_USERNAME="user@example.com"
+export DATAFORSEO_PASSWORD="XXXXX"
+```
+
+> For security, prefer setting these in your shell/profile or a `.env` file and not committing them to version control.
+
+#### Input keywords
+
+Populate `inputs/keywords.txt` with one keyword per line, for example:
+
+```text
+dampier things to do
+coastal towns north of perth
+...
+```
+
+#### Running the exporter
+
+From the project root:
+
+```bash
+python run_google_serp.py
+```
+
+The script will, for each keyword:
+
+- Call the `google_organic_live_advanced` endpoint of `SerpApi` with:
+  - `location_code = 9189292`
+  - `language_code = "en"`
+  - `device = "desktop"`
+  - `os = "macos"`
+  - `depth = 20`
+  - `load_async_ai_overview = true`
+- Create a folder under `outputs/` named `{keyword}-{timestamp}` (keyword sanitized for filesystem safety).
+- Write two CSV files into that folder:
+  - `ai_overview.csv`
+  - `organic_results.csv`
+
+#### AI Overview CSV schema
+
+Each row in `ai_overview.csv` corresponds to a single AI Overview reference used to generate an AI overview element and contains at least:
+
+- `keyword`: the search query
+- `domain`: the cited domain
+- `references_source`: AI Overview reference source name or title
+- `references_url`: reference page URL
+- `references_text`: text snippet from the page that was used to generate the AI overview element
+- `references_markdown`: the same snippet in markdown format
+
+#### Organic results CSV schema
+
+Each row in `organic_results.csv` corresponds to a single organic SERP result and contains:
+
+- `keyword`
+- `page`
+- `rank_group`
+- `rank_absolute`
+- `position`
+- `domain`
+- `url`
+- `title`
+- `description`
+- `extended_snippet`
+- `breadcrumb`
+- `website_name`
 
 Example of Task-Based request
 
